@@ -537,15 +537,15 @@ label.chip:has(> input[type="text"]) > input[type="text"] {
 
 </fieldset>
 <fieldset id="q10_container">
-  <legend>5. 通院してからどのくらい経過していますか？（1つ選択）</legend>
+  <legend>5. 通院してからどのくらい経過していますか？（複数回答可）</legend>
   <div class="radio-list" role="radiogroup" aria-label="通院期間">
-    <label class="chip"><input type="radio" name="q10" value="初めて">初めて</label>
-    <label class="chip"><input type="radio" name="q10" value="３カ月未満">３カ月未満</label>
-    <label class="chip"><input type="radio" name="q10" value="半年未満">半年未満</label>
-    <label class="chip"><input type="radio" name="q10" value="１年未満">１年未満</label>
-    <label class="chip"><input type="radio" name="q10" value="数年">数年</label>
-    <label class="chip"><input type="radio" name="q10" value="１０年以上">１０年以上</label>
-    <label class="chip"><input type="radio" name="q10" value="終診になった">終診になった</label>
+    <label class="chip"><input type="checkbox" name="q10" value="初めて" data-excludes='["３カ月未満","半年未満","１年未満","数年","１０年以上"]'>初めて</label>
+    <label class="chip"><input type="checkbox" name="q10" value="３カ月未満" data-excludes='["初めて","半年未満","１年未満","数年","１０年以上"]'>３カ月未満</label>
+    <label class="chip"><input type="checkbox" name="q10" value="半年未満" data-excludes='["初めて","３カ月未満","１年未満","数年","１０年以上"]'>半年未満</label>
+    <label class="chip"><input type="checkbox" name="q10" value="１年未満" data-excludes='["初めて","３カ月未満","半年未満","数年","１０年以上"]'>１年未満</label>
+    <label class="chip"><input type="checkbox" name="q10" value="数年" data-excludes='["初めて","３カ月未満","半年未満","１年未満","１０年以上"]'>数年</label>
+    <label class="chip"><input type="checkbox" name="q10" value="１０年以上" data-excludes='["初めて","３カ月未満","半年未満","１年未満","数年"]'>１０年以上</label>
+    <label class="chip"><input type="checkbox" name="q10" value="終診になった">終診になった</label>
   </div>
 </fieldset>
           <fieldset>
@@ -614,17 +614,50 @@ label.chip:has(> input[type="text"]) > input[type="text"] {
 <script>
 // ==== AIプロンプト（動的生成）====
   function computePeriodPhrase(ans) {
-  switch (ans.q10) {
-    case "初めて":     return "今回は初診でした。";
-    case "３カ月未満": return "通い始めてまだ数か月です。";
-    case "半年未満":   return "通い始めて半年程度です。";
-    case "１年未満":   return "通い始めて1年弱です。";
-    case "数年":       return "数年通っています。";
-    case "１０年以上": return "通院して10年以上になります。";
-    case "終診になった": return "通院は終了になりました。";
-    default:           return "";
+    const val = ans.q10;
+    if (!val) return "";
+    // When multiple values are selected, build phrases for each
+    if (Array.isArray(val)) {
+      const phrases = [];
+      for (const v of val) {
+        switch (v) {
+          case "初めて":
+            phrases.push("今回は初診でした。");
+            break;
+          case "３カ月未満":
+            phrases.push("通い始めてまだ数か月です。");
+            break;
+          case "半年未満":
+            phrases.push("通い始めて半年程度です。");
+            break;
+          case "１年未満":
+            phrases.push("通い始めて1年弱です。");
+            break;
+          case "数年":
+            phrases.push("数年通っています。");
+            break;
+          case "１０年以上":
+            phrases.push("通院して10年以上になります。");
+            break;
+          case "終診になった":
+            phrases.push("通院は終了になりました。");
+            break;
+        }
+      }
+      return phrases.join(" ");
+    }
+    // Single selection as string
+    switch (val) {
+      case "初めて":     return "今回は初診でした。";
+      case "３カ月未満": return "通い始めてまだ数か月です。";
+      case "半年未満":   return "通い始めて半年程度です。";
+      case "１年未満":   return "通い始めて1年弱です。";
+      case "数年":       return "数年通っています。";
+      case "１０年以上": return "通院して10年以上になります。";
+      case "終診になった": return "通院は終了になりました。";
+      default:           return "";
+    }
   }
-}
 // === SEO/MEO キーワード抽出＆ランダム順化 ===
 function getSeoTerms(ans) {
   // 使いたい固定キーワード（必要に応じて増減可）
@@ -962,7 +995,11 @@ function collectAnswers(form) {
     q6: getRating("q6"),
     q7: getRating("q7"),
     q8: getRating("q8"),
-    q10: document.querySelector("input[name='q10']:checked")?.value || "",
+    // Q10 can have multiple selections; collect all checked values or empty string
+    q10: (function(){
+      const vals = getCheckedValues('q10');
+      return vals.length ? vals : "";
+    })(),
     q9: document.getElementById("q9").value.trim()
   };
 }
