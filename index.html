@@ -995,10 +995,11 @@ function collectAnswers(form) {
     q6: getRating("q6"),
     q7: getRating("q7"),
     q8: getRating("q8"),
-    // Q10 can have multiple selections; collect all checked values or empty string
+    // Q10 can have multiple selections; if one value is selected return it as string, if multiple return array
     q10: (function(){
       const vals = getCheckedValues('q10');
-      return vals.length ? vals : "";
+      if (!vals.length) return "";
+      return vals.length === 1 ? vals[0] : vals;
     })(),
     q9: document.getElementById("q9").value.trim()
   };
@@ -1011,7 +1012,12 @@ function renderSummary(ans) {
   lines.push(`受診の目的/お困りごと: ${ans.q2?.length ? listJa(ans.q2) : "—"}`);
   lines.push(`選んだ経緯: ${ans.q1?.length ? listJa(ans.q1) : "—"}`);
   lines.push(`担当医: ${ans.q3 || "—"}`);
-  lines.push(`通院期間(Q6): ${ans.q10 || "—"}`);   // 画面上は6番に繰り上げ
+  // 通院期間は配列か単一かで表示を変える。Q10をまとめてQ5として扱う（画面上の番号に合わせて表記）。
+  if (Array.isArray(ans.q10)) {
+    lines.push(`通院期間(Q5): ${ans.q10.length ? listJa(ans.q10) : "—"}`);
+  } else {
+    lines.push(`通院期間(Q5): ${ans.q10 || "—"}`);
+  }
   lines.push(`理由(Q5): ${ans.q5?.length ? listJa(ans.q5) : "—"}`);
   if (ans.q9) lines.push(`自由記述(Q7): ${ans.q9}`);
   document.getElementById("answerSummary").textContent = lines.join("\n");
