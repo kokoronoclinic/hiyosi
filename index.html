@@ -487,6 +487,7 @@ label.chip:has(> input[type="text"]) > input[type="text"] {
               <!-- 担当医師の選択肢を更新 -->
               <label class="chip"><input type="radio" name="q3" value="田村裕介（院長）">田村裕介（院長）</label>
               <label class="chip"><input type="radio" name="q3" value="山内">山内</label>
+               <label class="chip"><input type="radio" name="q3" value="福間">福間</label>
               <label class="chip"><input type="radio" name="q3" value="田村京介（土）">田村京介（土）</label>
               <label class="chip"><input type="radio" name="q3" value="非常勤">非常勤</label>
               <label class="chip"><input type="radio" name="q3" value="その他">その他</label>
@@ -706,6 +707,7 @@ function getDoctorName(ans){
     "田村裕介（院長）": "田村",
     "田村京介（土）": "田村",
     "山内": "山内"
+    "福間": "福間"
   };
   if (surnameMap[val]) {
     return `${surnameMap[val]}先生`;
