@@ -738,8 +738,8 @@ function getDoctorName(ans){
 
 // ==== 接続先（絶対URLで）====
 const appConfig = {
-  // クリニック名を「心のクリニック日吉」に変更
-  clinicName: "心のクリニック日吉",
+  // クリニック名を「日吉心のクリニック」に変更
+  clinicName: "日吉心のクリニック",
 
   googleReviewUrl: "https://g.page/r/CThNJ8kxPlsHEBM/review",
   ai: { mode: "endpoint", endpoint: "https://clinic-review.onrender.com/api/review", headers: {} }
@@ -874,7 +874,7 @@ function generateReviewLocally(ans) {
 
   const endingsRaw = [
     "こちらを受診しました","コチラを受診しました",
-    "心のクリニックを受診しました","心のクリニック日吉を受診しました。"
+    "心のクリニックを受診しました","日吉心のクリニックを受診しました。"
   ];
   const endings = endingsRaw.map(s => s.replace(/[。．.]+$/u, ""));
   const ending = endings[Math.floor(Math.random() * endings.length)];
